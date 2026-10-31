@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>학교 길라잡이</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            main: '#8fb8ed',
+                            sub: '#b9f5d8',
+                            accent: '#e5a9a9',
+                            dark: '#4a6fa5',
+                            light: '#f4f9ff'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- 폰트 설정: 온글잎 박다현체 -->
+    <style>
+        @font-face {
+            font-family: 'OngleipParkDahyeon';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2411-3@1.0/Ownglyph_ParkDaHyun.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        * {
+            font-family: 'OngleipParkDahyeon', sans-serif !important;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        /* custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #8fb8ed;
+            border-radius: 10px;
+        }
+
+        .phone-container {
+            max-width: 430px;
+            height: 100vh;
+            max-height: 932px;
+        }
+
+        @media (min-width: 640px) {
+            body {
+                background-color: #f0f4f8;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+            }
+            .phone-container {
+                height: 884px;
+                border-radius: 40px;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                border: 8px solid #2d3748;
+                overflow: hidden;
+            }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(229, 169, 169, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(229, 169, 169, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(229, 169, 169, 0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- 모바일 애플리케이션 프레임 -->
+    <div class="phone-container w-full bg-white flex flex-col justify-between relative overflow-hidden">
+        
+        <!-- 상단 헤더 -->
+        <header class="bg-[#8fb8ed] text-gray-800 px-5 pt-8 pb-4 rounded-b-3xl shadow-sm z-20 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="bg-white p-2 rounded-2xl shadow-inner">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="24px" width="24px" fill="#4a6fa5">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold leading-tight tracking-wide text-gray-900">흥덕고 길라잡이</h1>
+                    <p class="text-xs text-gray-700 font-medium">청주흥덕고등학교 스마트 시설 안내</p>
+                </div>
+            </div>
+            <button onclick="switchTab('home')" class="p-2 bg-white/40 hover:bg-white/60 rounded-full transition-all active:scale-95">
+                <!-- 지정 아이콘: 홈 -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="24px" width="24px" fill="#1f1f1f">
+                    <path d="M6,19H9V13h6v6h3V10L12,5.5L6,10v9ZM4,21V9l8-6l8,6V21H13V15H11v6H4Zm8-8.75Z"/>
+                </svg>
+            </button>
+        </header>
+
+        <!-- 메인 콘텐츠 영역 (뷰 전환) -->
+        <main class="flex-1 overflow-y-auto relative bg-[#f4f9ff] p-4">
+
+            <!-- 1. 첫 화면 (메인 홈 뷰) -->
+            <section id="view-home" class="view-section space-y-4">
+                <!-- 환영 카드 -->
+                <div class="bg-gradient-to-br from-[#8fb8ed] to-[#b9f5d8] p-5 rounded-3xl text-gray-800 shadow-md">
+                    <h2 class="text-2xl font-bold mb-1">흥덕고에 오신 것을 환영합니다! 🏫</h2>
+                    <p class="text-sm opacity-90 mb-4">찾고자 하는 교실이나 시설을 자유롭게 검색해 보세요.</p>
+                    
+                    <button onclick="switchTab('search')" class="w-full bg-white text-gray-800 py-3.5 px-4 rounded-2xl flex items-center justify-between shadow-sm hover:shadow transition-all active:scale-98">
+                        <span class="text-lg text-gray-500 pl-2">목적지 교실/시설 검색...</span>
+                        <div class="bg-[#8fb8ed] p-2 rounded-xl text-white">
+                            <!-- 지정 아이콘: 검색 -->
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="20px" width="20px" fill="#ffffff">
+                                <path d="M2,19V17H12v2H2Zm0-5V12H7v2H2ZM2,9V7H7V9H2ZM20.6,19l-3.85-3.85q-0.6,0.42-1.31,0.64Q14.73,16 14,16q-2.07,0-3.54-1.46T9,11q0-2.08 1.46-3.54T14,6t3.54,1.46T19,11q0,0.72-0.21,1.44t-0.64,1.31L22,17.6L20.6,19ZM14,14q1.25,0 2.13-0.88T17,11T16.13,8.88T14,8T11.88,8.88T11,11t0.88,2.13T14,14Z"/>
+                            </svg>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- 빠른 메뉴 버튼 -->
+                <div>
+                    <button onclick="switchTab('map')" class="w-full bg-white p-4 rounded-3xl shadow-sm border border-blue-50 hover:bg-blue-50/50 flex items-center justify-between transition-all active:scale-95">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 rounded-2xl bg-[#8fb8ed]/20 flex items-center justify-center text-[#4a6fa5]">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5-4V4l5 4m0 0l6-4m-6 4v16m6-16l5 4v16l-5-4m0 0L9 20"/>
+                                </svg>
+                            </div>
+                            <div class="text-left">
+                                <span class="text-lg font-bold text-gray-800 block">2D 평면 지도 보기</span>
+                                <span class="text-xs text-gray-500">청주흥덕고 실제 시설 배치도</span>
+                            </div>
+                        </div>
+                        <span class="text-gray-400 font-bold">&gt;</span>
+                    </button>
+                </div>
+
+                <!-- 빠른 추천 장소 -->
+                <div class="bg-white p-4 rounded-3xl shadow-sm">
+                    <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center">
+                        <span class="w-2 h-2 rounded-full bg-[#e5a9a9] mr-2"></span> 주요 시설 바로가기
+                    </h3>
+                    <div class="flex space-x-2 overflow-x-auto pb-1">
+                        <button onclick="quickRoute('청솔관')" class="px-4 py-2 bg-[#e5a9a9]/20 border border-red-200 rounded-2xl text-base font-bold text-red-800 whitespace-nowrap hover:bg-[#e5a9a9]/40">🏀 청솔관(체육관)</button>
+                        <button onclick="quickRoute('도서실')" class="px-4 py-2 bg-[#f4f9ff] border border-blue-100 rounded-2xl text-base font-medium text-gray-700 whitespace-nowrap hover:bg-[#8fb8ed]/20">📚 도서실 (3층)</button>
+                        <button onclick="quickRoute('급식소')" class="px-4 py-2 bg-[#f4f9ff] border border-blue-100 rounded-2xl text-base font-medium text-gray-700 whitespace-nowrap hover:bg-[#8fb8ed]/20">🍱 급식소 (1층)</button>
+                        <button onclick="quickRoute('청솔마당')" class="px-4 py-2 bg-[#f4f9ff] border border-blue-100 rounded-2xl text-base font-medium text-gray-700 whitespace-nowrap hover:bg-[#8fb8ed]/20">🌳 청솔마당 (1층)</button>
+                        <button onclick="quickRoute('과학실I')" class="px-4 py-2 bg-[#f4f9ff] border border-blue-100 rounded-2xl text-base font-medium text-gray-700 whitespace-nowrap hover:bg-[#8fb8ed]/20">🧪 과학실I (2층)</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. 목록 화면 (검색 및 흥덕고 실제 배치 목록) -->
+            <section id="view-search" class="view-section hidden space-y-4">
+                <!-- 검색바 및 교체 버튼 -->
+                <div class="bg-white p-3 rounded-2xl shadow-sm space-y-2">
+                    <div class="flex items-center space-x-2 bg-[#f4f9ff] p-2.5 rounded-xl border border-gray-100">
+                        <span class="text-xs font-bold text-gray-400 w-8 text-center">출발</span>
+                        <input type="text" id="start-input" value="정문 입구" class="w-full bg-transparent text-base text-gray-800 focus:outline-none">
+                        <button onclick="swapLocations()" class="p-1 hover:bg-gray-200 rounded-lg transition-all" title="출발/도착 교체">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="20px" width="20px" fill="#1f1f1f">
+                                <path d="M12.05,20q-3.35,0-5.7-2.32T4,12V11.83l-1.6,1.6L1,12.02l4-4l4,4l-1.4,1.4L6,11.83V12q0,2.5 1.76,4.25T12.05,18q0.65,0 1.28-0.15t1.22-0.45l1.5,1.5q-0.95,0.55-1.95,0.83T12.05,20ZM19,15.98l-4-4l1.4-1.4l1.6,1.6V12q0-2.5-1.76-4.25T11.95,6Q11.3,6 10.68,6.15T9.45,6.6L7.95,5.1Q8.9,4.55 9.9,4.27T11.95,4q3.35,0 5.7,2.32T20,12v0.17l1.6-1.6l1.4,1.4l-4,4Z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-2 bg-[#f4f9ff] p-2.5 rounded-xl border border-blue-200">
+                        <span class="text-xs font-bold text-[#e5a9a9] w-8 text-center">도착</span>
+                        <input type="text" id="dest-input" placeholder="목적지 검색 (예: 청솔관, 3-1, 과학실)" oninput="filterPlaces()" class="w-full bg-transparent text-base text-gray-800 focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="20px" width="20px" fill="#8fb8ed">
+                            <path d="M2,19V17H12v2H2Zm0-5V12H7v2H2ZM2,9V7H7V9H2ZM20.6,19l-3.85-3.85q-0.6,0.42-1.31,0.64Q14.73,16 14,16q-2.07,0-3.54-1.46T9,11q0-2.08 1.46-3.54T14,6t3.54,1.46T19,11q0,0.72-0.21,1.44t-0.64,1.31L22,17.6L20.6,19ZM14,14q1.25,0 2.13-0.88T17,11T16.13,8.88T14,8T11.88,8.88T11,11t0.88,2.13T14,14Z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- 층별 필터 칩 -->
+                <div class="flex space-x-2 overflow-x-auto py-1">
+                    <button onclick="filterFloor('ALL')" class="floor-chip px-3 py-1.5 bg-[#8fb8ed] text-white rounded-xl text-sm font-bold shadow-sm">전체</button>
+                    <button onclick="filterFloor('1층')" class="floor-chip px-3 py-1.5 bg-white text-gray-600 rounded-xl text-sm font-bold shadow-sm">1층</button>
+                    <button onclick="filterFloor('2층')" class="floor-chip px-3 py-1.5 bg-white text-gray-600 rounded-xl text-sm font-bold shadow-sm">2층</button>
+                    <button onclick="filterFloor('3층')" class="floor-chip px-3 py-1.5 bg-white text-gray-600 rounded-xl text-sm font-bold shadow-sm">3층</button>
+                    <button onclick="filterFloor('4층')" class="floor-chip px-3 py-1.5 bg-white text-gray-600 rounded-xl text-sm font-bold shadow-sm">4층</button>
+                </div>
+
+                <!-- 등록된 장소 목록 -->
+                <div id="place-list-container" class="space-y-2.5">
+                    <!-- Dynamic rendering via JS -->
+                </div>
+            </section>
+
+            <!-- 3. 지도 및 안내 화면 -->
+            <section id="view-map" class="view-section hidden flex flex-col h-full space-y-3">
+                <!-- 층 선택 탭 바 및 시설 필터 칩 -->
+                <div class="bg-white p-2.5 rounded-2xl shadow-sm flex flex-col space-y-2">
+                    <div class="flex space-x-1 overflow-x-auto w-full">
+                        <button onclick="changeSelectedFloor('1층')" id="floor-btn-1층" class="floor-select-btn flex-1 py-1.5 px-3 text-center text-xs font-bold rounded-xl bg-[#8fb8ed] text-white shadow-sm transition-all">1층</button>
+                        <button onclick="changeSelectedFloor('2층')" id="floor-btn-2층" class="floor-select-btn flex-1 py-1.5 px-3 text-center text-xs font-bold rounded-xl bg-gray-100 text-gray-600 transition-all">2층</button>
+                        <button onclick="changeSelectedFloor('3층')" id="floor-btn-3층" class="floor-select-btn flex-1 py-1.5 px-3 text-center text-xs font-bold rounded-xl bg-gray-100 text-gray-600 transition-all">3층</button>
+                        <button onclick="changeSelectedFloor('4층')" id="floor-btn-4층" class="floor-select-btn flex-1 py-1.5 px-3 text-center text-xs font-bold rounded-xl bg-gray-100 text-gray-600 transition-all">4층</button>
+                    </div>
+                    
+                    <!-- 카테고리 스마트 하이라이트 칩 -->
+                    <div class="flex space-x-1.5 overflow-x-auto text-xs py-0.5">
+                        <button onclick="filterMapCategory('ALL')" class="map-cat-chip px-2.5 py-1 bg-gray-800 text-white rounded-lg font-bold shrink-0">전체보기</button>
+                        <button onclick="filterMapCategory('CLASS')" class="map-cat-chip px-2.5 py-1 bg-orange-100 text-orange-800 rounded-lg font-bold shrink-0">🏫 학급 교실</button>
+                        <button onclick="filterMapCategory('SPECIAL')" class="map-cat-chip px-2.5 py-1 bg-lime-100 text-lime-800 rounded-lg font-bold shrink-0">🧪 특별실/실습실</button>
+                        <button onclick="filterMapCategory('OFFICE')" class="map-cat-chip px-2.5 py-1 bg-sky-100 text-sky-800 rounded-lg font-bold shrink-0">💼 교무/행정</button>
+                        <button onclick="filterMapCategory('REST')" class="map-cat-chip px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-lg font-bold shrink-0">🚻 화장실/휴게</button>
+                    </div>
+                </div>
+
+                <!-- Canvas 지도 표현 영역 -->
+                <div class="relative flex-1 bg-white rounded-3xl shadow-sm overflow-hidden border-2 border-blue-100">
+                    <canvas id="mapCanvas" class="w-full h-full block"></canvas>
+                    
+                    <!-- 지도 위 오버레이 안내 -->
+                    <div id="map-target-card" class="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-3 py-2 rounded-2xl shadow-md border border-gray-100 flex items-center space-x-2 z-10">
+                        <div class="w-3 h-3 rounded-full bg-blue-500 animate-ping"></div>
+                        <span id="map-target-title" class="text-base font-bold text-gray-800">선택 시설: 도서실 (3층)</span>
+                    </div>
+
+                    <button onclick="recenterMap()" class="absolute bottom-4 right-4 bg-white p-3 rounded-2xl shadow-lg text-gray-700 active:scale-90 transition-all z-10">
+                        🎯
+                    </button>
+                </div>
+
+                <!-- 선택 시설 스마트 정보 카드 -->
+                <div class="bg-white p-4 rounded-3xl shadow-sm space-y-2">
+                    <div class="flex items-center justify-between border-b pb-1.5">
+                        <span class="text-xs text-[#8fb8ed] font-bold" id="info-card-category">학습/시설</span>
+                        <span class="text-xs bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded-md" id="info-card-floor">3층 위치</span>
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 id="info-card-name" class="text-lg font-bold text-gray-800">도서실</h4>
+                            <p id="info-card-desc" class="text-xs text-gray-600 mt-0.5">3층 중앙 복도 남측 도서실 공간</p>
+                        </div>
+                        <button onclick="openPlaceDetail(selectedPlace.id)" class="px-3 py-1.5 bg-[#8fb8ed] text-white text-xs font-bold rounded-xl shadow-sm hover:bg-blue-400 shrink-0">
+                            상세/공지보기 >
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. 장소 등록 화면 -->
+            <section id="view-add" class="view-section hidden space-y-4">
+                <div class="bg-white p-5 rounded-3xl shadow-sm space-y-4">
+                    <h3 class="text-xl font-bold text-gray-800 border-b pb-2">새 장소/시설 등록하기</h3>
+                    
+                    <form id="add-place-form" onsubmit="handleFormSubmit(event)" class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">장소/교실 이름</label>
+                            <input type="text" required id="form-name" placeholder="예: 동아리실, 무용실" class="w-full bg-[#f4f9ff] border border-gray-200 p-3 rounded-2xl text-base focus:outline-none focus:border-[#8fb8ed]">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">위치 (층수 선택)</label>
+                            <select id="form-floor" class="w-full bg-[#f4f9ff] border border-gray-200 p-3 rounded-2xl text-base focus:outline-none focus:border-[#8fb8ed]">
+                                <option value="1층">1층</option>
+                                <option value="2층">2층</option>
+                                <option value="3층">3층</option>
+                                <option value="4층">4층</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">주요 용도</label>
+                            <input type="text" id="form-usage" placeholder="예: 학급 수업, 자습, 학생 휴게" class="w-full bg-[#f4f9ff] border border-gray-200 p-3 rounded-2xl text-base focus:outline-none focus:border-[#8fb8ed]">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">담당 선생님 / 부서</label>
+                            <input type="text" id="form-teacher" placeholder="예: 학생안전부 / 김OO 선생님" class="w-full bg-[#f4f9ff] border border-gray-200 p-3 rounded-2xl text-base focus:outline-none focus:border-[#8fb8ed]">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">상세 설명 & 위치 안내</label>
+                            <textarea id="form-desc" rows="3" placeholder="장소의 특징이나 쉽게 찾을 수 있는 지형지물을 입력해 주세요." class="w-full bg-[#f4f9ff] border border-gray-200 p-3 rounded-2xl text-base focus:outline-none focus:border-[#8fb8ed]"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full bg-[#8fb8ed] text-white py-3.5 rounded-2xl font-bold text-lg shadow-md hover:bg-blue-400 active:scale-98 transition-all">
+                            흥덕고 배치도에 추가하기
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- 5. 상세 화면 -->
+            <section id="view-detail" class="view-section hidden space-y-4">
+                <div class="bg-white p-5 rounded-3xl shadow-sm space-y-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span id="detail-tag" class="bg-[#b9f5d8] text-teal-800 text-xs px-2.5 py-1 rounded-full font-bold">3층</span>
+                            <h2 id="detail-title" class="text-2xl font-bold text-gray-800 mt-1">도서실</h2>
+                        </div>
+                        <button onclick="switchTab('search')" class="text-gray-400 text-2xl font-bold hover:text-gray-600">&times;</button>
+                    </div>
+
+                    <!-- 시설 편의 정보 아이콘 태그 -->
+                    <div class="flex space-x-2 overflow-x-auto py-1">
+                        <span class="px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-xl text-xs font-bold shrink-0">🔌 콘센트 이용가능</span>
+                        <span class="px-2.5 py-1 bg-blue-50 text-blue-800 border border-blue-200 rounded-xl text-xs font-bold shrink-0">📶 Wi-Fi 비번: heungdeok123</span>
+                        <span class="px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-bold shrink-0">❄️ 냉난방 완비</span>
+                    </div>
+
+                    <!-- 오늘의 학급/시설 공지 메모판 -->
+                    <div class="bg-amber-50/80 border border-amber-200 p-3.5 rounded-2xl space-y-1">
+                        <div class="flex items-center space-x-1.5 text-amber-900 font-bold text-xs">
+                            <span>📢</span> <span>오늘의 알림 및 공지사항</span>
+                        </div>
+                        <p id="detail-notice" class="text-sm font-medium text-amber-950">
+                            "점심시간 12:40~13:20 대출 및 반납 가능. 이번 주 신간 도서 코너 개설 완료!"
+                        </p>
+                    </div>
+
+                    <!-- 세부정보 카드 -->
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="bg-[#f4f9ff] p-3 rounded-2xl border border-blue-50">
+                            <span class="text-gray-400 font-bold block mb-0.5">💡 주요 용도</span>
+                            <span id="detail-usage" class="font-bold text-gray-800">도서 대출, 독서 및 학업 자습</span>
+                        </div>
+                        <div class="bg-[#f4f9ff] p-3 rounded-2xl border border-blue-50">
+                            <span class="text-gray-400 font-bold block mb-0.5">👨‍🏫 담당 선생님/부서</span>
+                            <span id="detail-teacher" class="font-bold text-gray-800">도서운영부 / 사서교사</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <h4 class="text-sm font-bold text-gray-500">장소 상세 안내</h4>
+                        <p id="detail-desc" class="text-base text-gray-700 leading-relaxed bg-[#f4f9ff] p-3 rounded-2xl">
+                            3층 남측에 위치한 도서관입니다.
+                        </p>
+                    </div>
+
+                    <div class="pt-2">
+                        <button onclick="switchTab('map')" class="w-full bg-[#8fb8ed] text-white py-3.5 rounded-2xl font-bold text-lg shadow-md hover:bg-blue-400 active:scale-98 transition-all">
+                            🗺️ 안내도 위치 확인하기
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- 하단 네비게이션 바 -->
+        <nav class="bg-white border-t border-gray-100 px-6 py-3 flex justify-around items-center z-20">
+            <button onclick="switchTab('home')" id="nav-home" class="nav-btn flex flex-col items-center text-[#8fb8ed]">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="24px" width="24px" fill="currentColor">
+                    <path d="M6,19H9V13h6v6h3V10L12,5.5L6,10v9ZM4,21V9l8-6l8,6V21H13V15H11v6H4Zm8-8.75Z"/>
+                </svg>
+                <span class="text-xs font-bold mt-1">홈</span>
+            </button>
+
+            <button onclick="switchTab('search')" id="nav-search" class="nav-btn flex flex-col items-center text-gray-400 hover:text-[#8fb8ed]">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="24px" width="24px" fill="currentColor">
+                    <path d="M2,19V17H12v2H2Zm0-5V12H7v2H2ZM2,9V7H7V9H2ZM20.6,19l-3.85-3.85q-0.6,0.42-1.31,0.64Q14.73,16 14,16q-2.07,0-3.54-1.46T9,11q0-2.08 1.46-3.54T14,6t3.54,1.46T19,11q0,0.72-0.21,1.44t-0.64,1.31L22,17.6L20.6,19ZM14,14q1.25,0 2.13-0.88T17,11T16.13,8.88T14,8T11.88,8.88T11,11t0.88,2.13T14,14Z"/>
+                </svg>
+                <span class="text-xs font-bold mt-1">장소목록</span>
+            </button>
+
+            <button onclick="switchTab('map')" id="nav-map" class="nav-btn flex flex-col items-center text-gray-400 hover:text-[#8fb8ed]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5-4V4l5 4m0 0l6-4m-6 4v16m6-16l5 4v16l-5-4m0 0L9 20"/>
+                </svg>
+                <span class="text-xs font-bold mt-1">지도/길안내</span>
+            </button>
+
+            <button onclick="switchTab('add')" id="nav-add" class="nav-btn flex flex-col items-center text-gray-400 hover:text-[#8fb8ed]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                <span class="text-xs font-bold mt-1">등록</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- 스크립트 로직 -->
+    <script>
+        // 청주 흥덕고등학교 피난안내도 기반 전체 시설 데이터 정의
+        let samplePlaces = [
+            // 1층
+            { id: 1, name: "청솔관(체육관)", floor: "1층", category: "SPECIAL", desc: "1층 동남쪽에 위치한 다목적 체육관", usage: "체육 수업, 전교생 행사", teacher: "체육건강부", xRatio: 0.88, yRatio: 0.75 },
+            { id: 2, name: "급식소", floor: "1층", category: "SPECIAL", desc: "1층 서쪽에 위치한 학생 급식 공간", usage: "중식 및 식사 제공", teacher: "영양교사 / 조리실", xRatio: 0.20, yRatio: 0.46 },
+            { id: 3, name: "청솔마당", floor: "1층", category: "REST", desc: "1층 중정에 위치한 야외 휴게 마당", usage: "학생 휴식 및 휴게", teacher: "학생안전부", xRatio: 0.58, yRatio: 0.36 },
+            { id: 4, name: "행정실", floor: "1층", category: "OFFICE", desc: "1층 중앙 현관 및 아트홀 옆 위치", usage: "학교 행정 및 서류 발급", teacher: "행정실장 / 행정팀", xRatio: 0.45, yRatio: 0.63 },
+            { id: 5, name: "1-1", floor: "1층", category: "CLASS", desc: "1층 중앙 복도 남측 1학년 1반 교실", usage: "1-1 학급 수업 및 자습", teacher: "1-1 담임선생님", xRatio: 0.57, yRatio: 0.52 },
+            { id: 6, name: "1-2", floor: "1층", category: "CLASS", desc: "1층 중앙 복도 남측 1학년 2반 교실", usage: "1-2 학급 수업 및 자습", teacher: "1-2 담임선생님", xRatio: 0.67, yRatio: 0.52 },
+            { id: 7, name: "1-3", floor: "1층", category: "CLASS", desc: "1층 중앙 복도 남측 1학년 3반 교실", usage: "1-3 학급 수업 및 자습", teacher: "1-3 담임선생님", xRatio: 0.77, yRatio: 0.52 },
+            { id: 8, name: "1-4", floor: "1층", category: "CLASS", desc: "1층 청솔마당 북측 1학년 4반 교실", usage: "1-4 학급 수업 및 자습", teacher: "1-4 담임선생님", xRatio: 0.47, yRatio: 0.22 },
+            { id: 9, name: "1-5", floor: "1층", category: "CLASS", desc: "1층 청솔마당 북측 1학년 5반 교실", usage: "1-5 학급 수업 및 자습", teacher: "1-5 담임선생님", xRatio: 0.58, yRatio: 0.22 },
+            { id: 10, name: "1-6", floor: "1층", category: "CLASS", desc: "1층 청솔마당 북측 1학년 6반 교실", usage: "1-6 학급 수업 및 자습", teacher: "1-6 담임선생님", xRatio: 0.69, yRatio: 0.22 },
+
+            // 2층
+            { id: 11, name: "보건실", floor: "2층", category: "OFFICE", desc: "2층 중앙 계단 옆 응급 처치실", usage: "응급 처치 및 요양", teacher: "보건교사", xRatio: 0.41, yRatio: 0.46 },
+            { id: 12, name: "교장실", floor: "2층", category: "OFFICE", desc: "2층 중앙 계단 남측 위치", usage: "학교 집무실", teacher: "교장선생님", xRatio: 0.43, yRatio: 0.72 },
+            { id: 13, name: "과학실I", floor: "2층", category: "SPECIAL", desc: "2층 서쪽 영역 탐구 실험실", usage: "과학 실험 수업", teacher: "창의과학부", xRatio: 0.13, yRatio: 0.52 },
+            { id: 14, name: "2-1", floor: "2층", category: "CLASS", desc: "2층 북측 2학년 1반 교실", usage: "2-1 학급 수업 및 자습", teacher: "2-1 담임선생님", xRatio: 0.51, yRatio: 0.28 },
+            { id: 15, name: "2-2", floor: "2층", category: "CLASS", desc: "2층 북측 2학년 2반 교실", usage: "2-2 학급 수업 및 자습", teacher: "2-2 담임선생님", xRatio: 0.62, yRatio: 0.28 },
+            { id: 16, name: "2-3", floor: "2층", category: "CLASS", desc: "2층 북측 2학년 3반 교실", usage: "2-3 학급 수업 및 자습", teacher: "2-3 담임선생님", xRatio: 0.73, yRatio: 0.28 },
+
+            // 3층
+            { id: 17, name: "도서실", floor: "3층", category: "SPECIAL", desc: "3층 남측 도서관 및 휴게 학습 공간", usage: "도서 대출 및 자습", teacher: "도서운영부 / 사서교사", xRatio: 0.43, yRatio: 0.67 },
+            { id: 18, name: "컴퓨터실", floor: "3층", category: "SPECIAL", desc: "3층 서쪽 세미나실 옆 정보 실습실", usage: "정보 수업 및 실습", teacher: "정보담당교사", xRatio: 0.31, yRatio: 0.56 },
+            { id: 19, name: "2-8", floor: "3층", category: "CLASS", desc: "3층 북측 2학년 8반 교실", usage: "2-8 학급 수업 및 자습", teacher: "2-8 담임선생님", xRatio: 0.53, yRatio: 0.28 },
+            { id: 20, name: "2-9", floor: "3층", category: "CLASS", desc: "3층 북측 2학년 9반 교실", usage: "2-9 학급 수업 및 자습", teacher: "2-9 담임선생님", xRatio: 0.64, yRatio: 0.28 },
+            { id: 21, name: "2-10", floor: "3층", category: "CLASS", desc: "3층 북측 2학년 10반 교실", usage: "2-10 학급 수업 및 자습", teacher: "2-10 담임선생님", xRatio: 0.75, yRatio: 0.28 },
+
+            // 4층
+            { id: 22, name: "음악실", floor: "4층", category: "SPECIAL", desc: "4층 서쪽 끝 예체능 실습실", usage: "음악 실기 및 가창 수업", teacher: "예체능부", xRatio: 0.12, yRatio: 0.58 },
+            { id: 23, name: "미술실", floor: "4층", category: "SPECIAL", desc: "4층 3학년 연구실 인접 실습실", usage: "미술 실기 및 작품 제작", teacher: "예체능부", xRatio: 0.22, yRatio: 0.63 },
+            { id: 24, name: "3-1", floor: "4층", category: "CLASS", desc: "4층 남서쪽 3학년 1반 교실", usage: "3-1 학급 수업 및 자습", teacher: "3-1 담임선생님", xRatio: 0.23, yRatio: 0.84 },
+            { id: 25, name: "3-2", floor: "4층", category: "CLASS", desc: "4층 남서쪽 3학년 2반 교실", usage: "3-2 학급 수업 및 자습", teacher: "3-2 담임선생님", xRatio: 0.33, yRatio: 0.84 }
+        ];
+
+        let selectedPlace = samplePlaces[0];
+        let activeFloor = '1층';
+        let selectedCategoryFilter = 'ALL';
+
+        // 탭 전환 함수
+        function switchTab(tabId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            const targetView = document.getElementById(`view-${tabId}`);
+            if (targetView) targetView.classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-[#8fb8ed]');
+                btn.classList.add('text-gray-400');
+            });
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) {
+                activeNav.classList.remove('text-gray-400');
+                activeNav.classList.add('text-[#8fb8ed]');
+            }
+
+            if (tabId === 'map') {
+                setTimeout(drawMapCanvas, 50);
+            }
+        }
+
+        // 층 변경 핸들러
+        function changeSelectedFloor(floorStr) {
+            activeFloor = floorStr;
+            document.querySelectorAll('.floor-select-btn').forEach(btn => {
+                btn.className = "floor-select-btn flex-1 py-1.5 px-3 text-center text-xs font-bold rounded-xl bg-gray-100 text-gray-600 transition-all";
+            });
+            const activeBtn = document.getElementById(`floor-btn-${floorStr}`);
+            if (activeBtn) {
+                activeBtn.className = "floor-select-btn flex-1 py-1.5 px-3 text-center text-xs font-bold rounded-xl bg-[#8fb8ed] text-white shadow-sm transition-all";
+            }
+
+            const placeInFloor = samplePlaces.find(p => p.floor === floorStr);
+            if (placeInFloor) {
+                selectedPlace = placeInFloor;
+                updateInfoCard(selectedPlace);
+            }
+            drawMapCanvas();
+        }
+
+        // 장소 목록 렌더링
+        function renderPlaceList(places) {
+            const container = document.getElementById('place-list-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            places.forEach(place => {
+                const item = document.createElement('div');
+                item.className = 'p-4 rounded-2xl shadow-sm border border-gray-100 bg-white hover:bg-blue-50/50 cursor-pointer transition-all active:scale-98 flex items-center justify-between';
+                item.onclick = () => openPlaceDetail(place.id);
+                item.innerHTML = `
+                    <div class="space-y-1">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-lg font-bold text-gray-800">${place.name}</span>
+                            <span class="bg-[#b9f5d8] text-teal-900 text-xs px-2 py-0.5 rounded-md font-bold">${place.floor}</span>
+                        </div>
+                        <p class="text-xs text-gray-500">${place.desc}</p>
+                    </div>
+                    <div class="text-[#8fb8ed] font-bold text-sm">
+                        상세/위치 >
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // 빠른 찾기
+        function quickRoute(placeName) {
+            const found = samplePlaces.find(p => p.name.includes(placeName));
+            if (found) {
+                openPlaceDetail(found.id);
+            }
+        }
+
+        // 검색 필터링
+        function filterPlaces() {
+            const query = document.getElementById('dest-input').value.toLowerCase();
+            const filtered = samplePlaces.filter(p => p.name.toLowerCase().includes(query) || p.floor.includes(query));
+            renderPlaceList(filtered);
+        }
+
+        function filterFloor(floor) {
+            document.querySelectorAll('.floor-chip').forEach(btn => {
+                btn.className = "floor-chip px-3 py-1.5 bg-white text-gray-600 rounded-xl text-sm font-bold shadow-sm";
+            });
+            event.target.className = "floor-chip px-3 py-1.5 bg-[#8fb8ed] text-white rounded-xl text-sm font-bold shadow-sm";
+
+            if (floor === 'ALL') {
+                renderPlaceList(samplePlaces);
+            } else {
+                renderPlaceList(samplePlaces.filter(p => p.floor.includes(floor)));
+            }
+        }
+
+        // 출발지/도착지 위치 스왑
+        function swapLocations() {
+            const start = document.getElementById('start-input');
+            const dest = document.getElementById('dest-input');
+            const temp = start.value;
+            start.value = dest.value || "정문 입구";
+            dest.value = temp;
+        }
+
+        function recenterMap() {
+            drawMapCanvas();
+        }
+
+        // 새 장소 등록 폼 제출
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById('form-name').value;
+            const floor = document.getElementById('form-floor').value;
+            const usage = document.getElementById('form-usage').value || "학습 및 시설 이용";
+            const teacher = document.getElementById('form-teacher').value || "담당 교사 미지정";
+            const desc = document.getElementById('form-desc').value || "새롭게 등록된 흥덕고 시설입니다.";
+
+            const newId = samplePlaces.length + 1;
+            const newPlace = {
+                id: newId,
+                name: name,
+                floor: floor,
+                category: "SPECIAL",
+                desc: desc,
+                usage: usage,
+                teacher: teacher,
+                xRatio: 0.5,
+                yRatio: 0.5
+            };
+
+            samplePlaces.push(newPlace);
+            alert(`'${name}' 시설이 성공적으로 등록되었습니다!`);
+            document.getElementById('add-place-form').reset();
+            renderPlaceList(samplePlaces);
+            openPlaceDetail(newId);
+        }
+
+        // 장소 상세 보기 열기
+        function openPlaceDetail(id) {
+            selectedPlace = samplePlaces.find(p => p.id === id) || samplePlaces[0];
+            activeFloor = selectedPlace.floor;
+            document.getElementById('detail-title').innerText = selectedPlace.name;
+            document.getElementById('detail-tag').innerText = selectedPlace.floor;
+            document.getElementById('detail-desc').innerText = selectedPlace.desc;
+
+            document.getElementById('detail-usage').innerText = selectedPlace.usage || "학습 및 시설 이용";
+            document.getElementById('detail-teacher').innerText = selectedPlace.teacher || "담당 교사 / 해당 부서";
+            
+            const noticeEl = document.getElementById('detail-notice');
+            if (selectedPlace.name.includes('도서실')) {
+                noticeEl.innerText = "📢 점심시간(12:40~13:20) 자유 대출 및 반납 운영 중입니다.";
+            } else if (selectedPlace.name.includes('급식소')) {
+                noticeEl.innerText = "📢 오늘의 추천 메뉴: 찹쌀밥, 닭갈비, 계란말이, 무쌈, 깍두기";
+            } else if (selectedPlace.name.includes('청솔관')) {
+                noticeEl.innerText = "📢 실내화(체육관 전용 운동화) 착용 필수입니다.";
+            } else if (selectedPlace.name.includes('과학실')) {
+                noticeEl.innerText = "📢 실험 수업 진행 중. 보안안경 및 실험복 착용 요망.";
+            } else {
+                noticeEl.innerText = `📢 ${selectedPlace.name} 이용 시 정숙 및 이동수업 규칙을 준수해 주세요.`;
+            }
+
+            updateInfoCard(selectedPlace);
+            switchTab('detail');
+        }
+
+        function updateInfoCard(place) {
+            document.getElementById('info-card-name').innerText = place.name;
+            document.getElementById('info-card-desc').innerText = place.desc;
+            document.getElementById('info-card-floor').innerText = `${place.floor} 위치`;
+            document.getElementById('map-target-title').innerText = `선택 시설: ${place.name} (${place.floor})`;
+            
+            let catName = "학급 교실";
+            if (place.category === 'SPECIAL') catName = "특별실/실습실";
+            else if (place.category === 'OFFICE') catName = "교무/행정";
+            else if (place.category === 'REST') catName = "화장실/휴게";
+            document.getElementById('info-card-category').innerText = catName;
+        }
+
+        // 카테고리 필터링
+        function filterMapCategory(cat) {
+            selectedCategoryFilter = cat;
+            document.querySelectorAll('.map-cat-chip').forEach(btn => {
+                btn.className = "map-cat-chip px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg font-bold shrink-0";
+            });
+            event.target.className = "map-cat-chip px-2.5 py-1 bg-gray-800 text-white rounded-lg font-bold shrink-0";
+            drawMapCanvas();
+        }
+
+        // 피난안내도 층별 정밀 렌더링
+        function drawMapCanvas() {
+            const canvas = document.getElementById('mapCanvas');
+            if (!canvas) return;
+            
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+
+            ctx.clearRect(0, 0, w, h);
+
+            // 실제 안내도 배경
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(0, 0, w, h);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.08)';
+            ctx.shadowBlur = 12;
+            ctx.shadowOffsetY = 4;
+            ctx.fillRect(6, 6, w - 12, h - 12);
+            ctx.shadowColor = 'transparent';
+
+            ctx.strokeStyle = '#1e3a8a';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(8, 8, w - 16, h - 16);
+
+            // 상단 헤더
+            ctx.fillStyle = '#1e3a8a';
+            ctx.fillRect(8, 8, w - 16, 36);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(32, 26, 12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#1e3a8a';
+            ctx.font = 'bold 12px OngleipParkDahyeon';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(activeFloor, 32, 26);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 15px OngleipParkDahyeon';
+            ctx.textAlign = 'left';
+            ctx.fillText(`흥덕고등학교 ${activeFloor} 전체 시설 안내도`, 54, 26);
+
+            const COLOR_CLASS = { fill: '#ee6c37', stroke: '#2b2b2b', text: '#ffffff', cat: 'CLASS' };
+            const COLOR_SPECIAL = { fill: '#9ec639', stroke: '#2b2b2b', text: '#1e293b', cat: 'SPECIAL' };
+            const COLOR_OFFICE = { fill: '#4fa3d1', stroke: '#2b2b2b', text: '#ffffff', cat: 'OFFICE' };
+            const COLOR_REST = { fill: '#80cf9b', stroke: '#2b2b2b', text: '#064e1b', cat: 'REST' };
+            const COLOR_HALL = { fill: '#ffffff', stroke: '#2b2b2b', text: '#1e293b', cat: 'ALL' };
+
+            function drawBlock(x, y, width, height, label, style = COLOR_CLASS, fontSize = 9) {
+                let fillStyle = style.fill;
+                if (selectedCategoryFilter !== 'ALL' && style.cat !== 'ALL' && style.cat !== selectedCategoryFilter) {
+                    fillStyle = '#e2e8f0';
+                }
+
+                ctx.fillStyle = fillStyle;
+                ctx.strokeStyle = style.stroke;
+                ctx.lineWidth = 1.4;
+                ctx.fillRect(x, y, width, height);
+                ctx.strokeRect(x, y, width, height);
+                
+                if (label) {
+                    ctx.fillStyle = (fillStyle === '#e2e8f0') ? '#94a3b8' : style.text;
+                    ctx.font = `bold ${fontSize}px OngleipParkDahyeon`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    
+                    const lines = label.split('\n');
+                    if (lines.length > 1) {
+                        const lineHeight = fontSize + 2;
+                        const startY = y + height / 2 - ((lines.length - 1) * lineHeight) / 2;
+                        lines.forEach((line, idx) => {
+                            ctx.fillText(line, x + width / 2, startY + idx * lineHeight);
+                        });
+                    } else {
+                        ctx.fillText(label, x + width / 2, y + height / 2);
+                    }
+                }
+            }
+
+            function drawStairs(x, y, width, height, isCurved = false) {
+                ctx.fillStyle = '#f1f5f9';
+                ctx.strokeStyle = '#1e293b';
+                ctx.lineWidth = 1.2;
+                ctx.fillRect(x, y, width, height);
+                ctx.strokeRect(x, y, width, height);
+                
+                ctx.beginPath();
+                if (isCurved) {
+                    const cx = x + width / 2;
+                    const cy = y + height;
+                    for (let r = 4; r <= width / 2; r += 5) {
+                        ctx.arc(cx, cy, r, Math.PI, 0, false);
+                    }
+                } else {
+                    const steps = 5;
+                    for (let i = 1; i < steps; i++) {
+                        ctx.moveTo(x + (width / steps) * i, y);
+                        ctx.lineTo(x + (width / steps) * i, y + height);
+                    }
+                }
+                ctx.stroke();
+            }
+
+            function drawElevator(x, y, width, height) {
+                ctx.fillStyle = '#e2e8f0';
+                ctx.strokeStyle = '#1e293b';
+                ctx.lineWidth = 1.2;
+                ctx.fillRect(x, y, width, height);
+                ctx.strokeRect(x, y, width, height);
+                
+                ctx.beginPath();
+                ctx.moveTo(x, y); ctx.lineTo(x + width, y + height);
+                ctx.moveTo(x + width, y); ctx.lineTo(x, y + height);
+                ctx.stroke();
+            }
+
+            // 1층 ~ 4층 구조
+            if (activeFloor === '1층') {
+                drawBlock(w * 0.38, h * 0.16, w * 0.38, h * 0.58, "1층 복도 & 홀", COLOR_HALL, 10);
+                drawBlock(w * 0.05, h * 0.35, w * 0.33, h * 0.22, "급식소", COLOR_SPECIAL, 13);
+                drawBlock(w * 0.05, h * 0.57, w * 0.16, h * 0.10, "조리실", COLOR_OFFICE, 10);
+                drawBlock(w * 0.21, h * 0.57, w * 0.17, h * 0.10, "영양사실", COLOR_OFFICE, 10);
+                drawBlock(w * 0.05, h * 0.67, w * 0.16, h * 0.18, "문서고 / 비품창고", COLOR_SPECIAL, 9);
+                drawBlock(w * 0.21, h * 0.67, w * 0.17, h * 0.18, "교육지원실", COLOR_OFFICE, 9);
+
+                drawBlock(w * 0.42, h * 0.16, w * 0.11, h * 0.12, "1-4", COLOR_CLASS, 11);
+                drawBlock(w * 0.53, h * 0.16, w * 0.11, h * 0.12, "1-5", COLOR_CLASS, 11);
+                drawBlock(w * 0.64, h * 0.16, w * 0.11, h * 0.12, "1-6", COLOR_CLASS, 11);
+                drawBlock(w * 0.75, h * 0.13, w * 0.08, h * 0.07, "화장실(여)", COLOR_REST, 8);
+                drawBlock(w * 0.75, h * 0.20, w * 0.08, h * 0.08, "화장실(남)", COLOR_REST, 8);
+                
+                drawBlock(w * 0.42, h * 0.28, w * 0.33, h * 0.16, "청솔마당", COLOR_REST, 12);
+                drawBlock(w * 0.29, h * 0.16, w * 0.13, h * 0.12, "1학년연구실", COLOR_OFFICE, 9);
+
+                drawBlock(w * 0.52, h * 0.46, w * 0.10, h * 0.12, "1-1", COLOR_CLASS, 11);
+                drawBlock(w * 0.62, h * 0.46, w * 0.10, h * 0.12, "1-2", COLOR_CLASS, 11);
+                drawBlock(w * 0.72, h * 0.46, w * 0.10, h * 0.12, "1-3", COLOR_CLASS, 11);
+
+                drawBlock(w * 0.38, h * 0.46, w * 0.14, h * 0.10, "1층 아트홀", COLOR_HALL, 10);
+                drawBlock(w * 0.38, h * 0.56, w * 0.14, h * 0.15, "행정실", COLOR_OFFICE, 11);
+
+                drawBlock(w * 0.81, h * 0.62, w * 0.15, h * 0.26, "청솔관\n(체육관)", COLOR_SPECIAL, 10);
+                drawBlock(w * 0.81, h * 0.28, w * 0.15, h * 0.25, "청솔학사\n(기숙사)", COLOR_OFFICE, 10);
+
+                drawStairs(w * 0.42, h * 0.09, w * 0.11, h * 0.07);
+                drawStairs(w * 0.42, h * 0.46, w * 0.08, h * 0.09, true);
+                drawElevator(w * 0.38, h * 0.40, w * 0.04, h * 0.05);
+
+            } else if (activeFloor === '2층') {
+                drawBlock(w * 0.35, h * 0.15, w * 0.45, h * 0.65, "2층 복도 & 중정", COLOR_HALL, 10);
+
+                drawBlock(w * 0.05, h * 0.46, w * 0.16, h * 0.12, "과학실I", COLOR_SPECIAL, 11);
+                drawBlock(w * 0.21, h * 0.46, w * 0.14, h * 0.12, "과학준비실", COLOR_SPECIAL, 9);
+                drawBlock(w * 0.05, h * 0.58, w * 0.16, h * 0.12, "과학실II", COLOR_SPECIAL, 11);
+                drawBlock(w * 0.21, h * 0.58, w * 0.16, h * 0.12, "과학실III", COLOR_SPECIAL, 11);
+
+                drawBlock(w * 0.46, h * 0.22, w * 0.11, h * 0.13, "2-1", COLOR_CLASS, 11);
+                drawBlock(w * 0.57, h * 0.22, w * 0.11, h * 0.13, "2-2", COLOR_CLASS, 11);
+                drawBlock(w * 0.68, h * 0.22, w * 0.11, h * 0.13, "2-3", COLOR_CLASS, 11);
+                drawBlock(w * 0.52, h * 0.15, w * 0.10, h * 0.07, "화장실(여)", COLOR_REST, 8);
+                drawBlock(w * 0.62, h * 0.15, w * 0.10, h * 0.07, "화장실(남)", COLOR_REST, 8);
+
+                drawBlock(w * 0.35, h * 0.40, w * 0.12, h * 0.12, "보건실", COLOR_OFFICE, 11);
+                drawBlock(w * 0.35, h * 0.28, w * 0.12, h * 0.12, "1-10", COLOR_CLASS, 11);
+                drawBlock(w * 0.35, h * 0.16, w * 0.12, h * 0.12, "진로상담실", COLOR_OFFICE, 10);
+
+                drawBlock(w * 0.57, h * 0.52, w * 0.10, h * 0.12, "1-7", COLOR_CLASS, 11);
+                drawBlock(w * 0.67, h * 0.52, w * 0.10, h * 0.12, "1-8", COLOR_CLASS, 11);
+                drawBlock(w * 0.77, h * 0.52, w * 0.10, h * 0.12, "1-9", COLOR_CLASS, 11);
+                drawBlock(w * 0.37, h * 0.66, w * 0.12, h * 0.12, "교장실", COLOR_OFFICE, 11);
+                drawBlock(w * 0.37, h * 0.78, w * 0.12, h * 0.10, "방송실", COLOR_OFFICE, 10);
+
+                drawStairs(w * 0.46, h * 0.15, w * 0.06, h * 0.07);
+                drawStairs(w * 0.47, h * 0.48, w * 0.06, h * 0.08, true);
+                drawElevator(w * 0.35, h * 0.52, w * 0.04, h * 0.05);
+
+            } else if (activeFloor === '3층') {
+                drawBlock(w * 0.32, h * 0.15, w * 0.50, h * 0.68, "3층 복도 & 홀", COLOR_HALL, 10);
+
+                drawBlock(w * 0.12, h * 0.40, w * 0.12, h * 0.22, "세미나실", COLOR_OFFICE, 11);
+                drawBlock(w * 0.24, h * 0.40, w * 0.14, h * 0.11, "영어전용실", COLOR_SPECIAL, 10);
+                drawBlock(w * 0.24, h * 0.51, w * 0.14, h * 0.11, "컴퓨터실", COLOR_SPECIAL, 11);
+
+                drawBlock(w * 0.48, h * 0.22, w * 0.11, h * 0.13, "2-8", COLOR_CLASS, 11);
+                drawBlock(w * 0.59, h * 0.22, w * 0.11, h * 0.13, "2-9", COLOR_CLASS, 11);
+                drawBlock(w * 0.70, h * 0.22, w * 0.11, h * 0.13, "2-10", COLOR_CLASS, 11);
+
+                drawBlock(w * 0.50, h * 0.52, w * 0.10, h * 0.12, "2-4", COLOR_CLASS, 11);
+                drawBlock(w * 0.60, h * 0.52, w * 0.10, h * 0.12, "2-5", COLOR_CLASS, 11);
+                drawBlock(w * 0.70, h * 0.52, w * 0.10, h * 0.12, "2-6", COLOR_CLASS, 11);
+                drawBlock(w * 0.80, h * 0.52, w * 0.10, h * 0.12, "2-7", COLOR_CLASS, 11);
+
+                drawBlock(w * 0.38, h * 0.55, w * 0.10, h * 0.25, "도서실", COLOR_SPECIAL, 12);
+                drawBlock(w * 0.38, h * 0.40, w * 0.18, h * 0.10, "3층홀", COLOR_HALL, 11);
+
+                drawBlock(w * 0.54, h * 0.15, w * 0.09, h * 0.07, "화장실(여)", COLOR_REST, 8);
+                drawBlock(w * 0.63, h * 0.15, w * 0.09, h * 0.07, "화장실(남)", COLOR_REST, 8);
+
+                drawStairs(w * 0.48, h * 0.15, w * 0.06, h * 0.07);
+                drawStairs(w * 0.46, h * 0.45, w * 0.06, h * 0.07, true);
+                drawElevator(w * 0.38, h * 0.50, w * 0.04, h * 0.05);
+
+            } else if (activeFloor === '4층') {
+                drawBlock(w * 0.30, h * 0.15, w * 0.55, h * 0.72, "4층 복도 & 홀", COLOR_HALL, 10);
+
+                drawBlock(w * 0.07, h * 0.48, w * 0.10, h * 0.20, "음악실", COLOR_SPECIAL, 11);
+                drawBlock(w * 0.17, h * 0.58, w * 0.11, h * 0.10, "미술실", COLOR_SPECIAL, 11);
+                drawBlock(w * 0.28, h * 0.48, w * 0.13, h * 0.10, "3학년 연구실", COLOR_OFFICE, 9);
+
+                drawBlock(w * 0.49, h * 0.22, w * 0.11, h * 0.13, "3-8", COLOR_CLASS, 11);
+                drawBlock(w * 0.60, h * 0.22, w * 0.11, h * 0.13, "3-9", COLOR_CLASS, 11);
+                drawBlock(w * 0.71, h * 0.22, w * 0.11, h * 0.13, "3-10", COLOR_CLASS, 11);
+
+                drawBlock(w * 0.52, h * 0.55, w * 0.10, h * 0.12, "3-4", COLOR_CLASS, 11);
+                drawBlock(w * 0.62, h * 0.55, w * 0.10, h * 0.12, "3-5", COLOR_CLASS, 11);
+                drawBlock(w * 0.72, h * 0.55, w * 0.10, h * 0.12, "3-6", COLOR_CLASS, 11);
+                drawBlock(w * 0.82, h * 0.55, w * 0.10, h * 0.12, "3-7", COLOR_CLASS, 11);
+
+                drawBlock(w * 0.18, h * 0.78, w * 0.10, h * 0.12, "3-1", COLOR_CLASS, 11);
+                drawBlock(w * 0.28, h * 0.78, w * 0.10, h * 0.12, "3-2", COLOR_CLASS, 11);
+                drawBlock(w * 0.38, h * 0.78, w * 0.11, h * 0.12, "Wee클래스", COLOR_OFFICE, 9);
+
+                drawStairs(w * 0.49, h * 0.15, w * 0.06, h * 0.07);
+                drawStairs(w * 0.50, h * 0.48, w * 0.06, h * 0.07, true);
+                drawElevator(w * 0.44, h * 0.48, w * 0.04, h * 0.05);
+            }
+
+            // 선택된 시설 핀 표출
+            if (selectedPlace && selectedPlace.floor === activeFloor) {
+                const targetX = w * selectedPlace.xRatio;
+                const targetY = h * selectedPlace.yRatio;
+
+                ctx.fillStyle = 'rgba(59, 130, 246, 0.25)';
+                ctx.beginPath();
+                ctx.arc(targetX, targetY, 22, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#2563eb';
+                ctx.beginPath();
+                ctx.arc(targetX, targetY, 9, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.lineWidth = 2.5;
+                ctx.strokeStyle = '#ffffff';
+                ctx.stroke();
+
+                const labelText = `📌 ${selectedPlace.name}`;
+                ctx.font = 'bold 12px OngleipParkDahyeon';
+                const textWidth = ctx.measureText(labelText).width;
+                const paddingX = 10;
+                const boxHeight = 22;
+                const boxX = targetX - (textWidth + paddingX * 2) / 2;
+                const boxY = targetY - 34;
+
+                ctx.fillStyle = '#2563eb';
+                ctx.beginPath();
+                ctx.roundRect(boxX, boxY, textWidth + paddingX * 2, boxHeight, 8);
+                ctx.fill();
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = '#ffffff';
+                ctx.stroke();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(labelText, targetX, boxY + boxHeight / 2);
+            }
+        }
+
+        // 초기화 실행
+        window.onload = function() {
+            renderPlaceList(samplePlaces);
+            drawMapCanvas();
+            window.addEventListener('resize', drawMapCanvas);
+        };
+    </script>
+</body>
+</html>
